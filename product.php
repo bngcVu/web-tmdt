@@ -70,12 +70,6 @@
         <div class="container">
             <div class="row justify-content-center a2">
                 <div class="col-lg-8 a2">
-<<<<<<< HEAD
-=======
-                        <!-- <div class="a1">
-                            <h2>Sản Phẩm</h2>
-                        </div> -->
->>>>>>> bb3725513d7e54cb1c1f205b654bb9655890933e
                 </div>
             </div>
         </div>

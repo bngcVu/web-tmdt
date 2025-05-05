@@ -7,11 +7,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<<<<<<< HEAD
     <title>Smobile</title>
-=======
-    <title>Smobile - Đăng Nhập</title>
->>>>>>> bb3725513d7e54cb1c1f205b654bb9655890933e
     <link rel="icon" href="img/logos.png">
     <link rel="stylesheet" href="css/bootstrap.min.css">
     <link rel="stylesheet" href="css/animate.css">
@@ -114,11 +110,7 @@
             background-color: #d43c1e;
         }
 
-<<<<<<< HEAD
         /* container form */
-=======
-        /* Стилі cho container form */
->>>>>>> bb3725513d7e54cb1c1f205b654bb9655890933e
         .login_part_form_iner {
             padding: 30px;
             background-color: #fff;
