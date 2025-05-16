@@ -1,7 +1,5 @@
 <?php
 ob_start();
-<<<<<<< HEAD
-
 try {
     // Kết nối đến cơ sở dữ liệu MySQL sử dụng PDO (PHP Data Objects).
     // Thay đổi 'localhost', 'smobile', 'root', '' nếu thông tin đăng nhập của bạn khác.
@@ -78,7 +76,6 @@ date_default_timezone_set('Asia/Ho_Chi_Minh');
 // $timestamp = time(); // $today hiện được đặt trong cart.php khi cần cho đơn hàng
 // $today = date('d-m-Y H:i:s', $timestamp); // Biến $today toàn cục này có thể không phải lúc nào cũng là thứ bạn cần.
 ?>
-=======
 try {
     $conn = new PDO("mysql:host=localhost;dbname=smobile;charset=utf8", "root", "");
 } catch (PDOException $e) {
@@ -102,4 +99,4 @@ date_default_timezone_set('Asia/Ho_Chi_Minh');
 $timestamp = time();
 $today = date('d-m-Y H:i:s', $timestamp);
 ?>
->>>>>>> 86b5ff066f52aaba0e6c3f45fb055d9708578487
+
