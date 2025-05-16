@@ -7,10 +7,7 @@
             <div class="row justify-content-around">
                 <div class="col-sm-6 col-lg-3 mb-4">
                     <div class="single_footer_part">
-                        <div class="d-flex align-items-center mb-3">
-                            <img src="img/logos.png" alt="Smobile" style="height:32px; margin-right:10px;">
-                            <h4 style="margin: 0; font-weight: bold;">Smobile</h4>
-                        </div>
+                        <h4 class="footer-title">Smobile</h4>
                         <ul class="list-unstyled">
                             <li><i class="fa fa-map-marker-alt"></i> 1A6 P. Cù Chính Lan, Khương Thượng, Thanh Xuân, Hà Nội</li>
                             <li><i class="fa fa-phone"></i> Hotline: <a href="tel:0123456789">0123.456.789</a></li>
