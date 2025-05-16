@@ -111,6 +111,9 @@
         }
 
 
+
+
+        /* container form */
         .login_part_form_iner {
             padding: 30px;
             background-color: #fff;

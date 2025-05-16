@@ -167,4 +167,12 @@
     <script src="js/custom.js"></script>
 </body>
 
+
 </html>
+
+</html>
+<?php
+    include './connect.php';
+?>
+
+

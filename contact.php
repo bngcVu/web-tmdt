@@ -241,4 +241,11 @@
     
 </body>
 
+
 </html>
+
+</html>
+<?php
+    include './connect.php';
+?>
+
