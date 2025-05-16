@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <?php 
     include './connect.php';  
 ?>
@@ -242,3 +243,8 @@
 </body>
 
 </html>
+=======
+<?php
+    include './connect.php';
+?>
+>>>>>>> 86b5ff066f52aaba0e6c3f45fb055d9708578487

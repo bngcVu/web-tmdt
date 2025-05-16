@@ -110,7 +110,11 @@
             background-color: #d43c1e;
         }
 
+<<<<<<< HEAD
 
+=======
+        /* container form */
+>>>>>>> 86b5ff066f52aaba0e6c3f45fb055d9708578487
         .login_part_form_iner {
             padding: 30px;
             background-color: #fff;
