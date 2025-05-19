@@ -1,5 +1,5 @@
 <?php 
-    session_start(); // Add session_start for consistency
+    session_start(); // Thêm session_start để đồng bộ
     include './connect.php';  
 
     $idtaikhoan = null;
@@ -8,12 +8,12 @@
 
     if (isset($_COOKIE["user"])) {
         $taikhoan_cookie = $_COOKIE["user"];
-        // Use prepared statement to get user details
+        // Sử dụng prepared statement để lấy thông tin người dùng
         $userData = selectAll("SELECT id, diachi FROM taikhoan WHERE taikhoan = ?", [$taikhoan_cookie]);
         if (!empty($userData)) {
             $user = $userData[0];
             $idtaikhoan = $user['id'];
-            $diachitaikhoan = $user['diachi']; // Default address
+            $diachitaikhoan = $user['diachi']; // Địa chỉ mặc định
             $loggedIn = true;
         }
     }
@@ -22,30 +22,30 @@
 <html lang="zxx">
 
 <head>
-  <!-- Required meta tags -->
+  <!-- Thẻ meta cần thiết -->
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <title>Lịch sử đơn hàng</title>
   <link rel="icon" href="img/logos.png">
-  <!-- Bootstrap CSS -->
+  <!-- CSS của Bootstrap -->
   <link rel="stylesheet" href="css/bootstrap.min.css">
-  <!-- animate CSS -->
+  <!-- CSS animation -->
   <link rel="stylesheet" href="css/animate.css">
-  <!-- owl carousel CSS -->
+  <!-- CSS owl carousel -->
   <link rel="stylesheet" href="css/owl.carousel.min.css">
-  <!-- nice select CSS -->
+  <!-- CSS nice select -->
   <link rel="stylesheet" href="css/nice-select.css">
-  <!-- font awesome CSS -->
+  <!-- CSS font awesome -->
   <link rel="stylesheet" href="css/all.css">
-  <!-- flaticon CSS -->
+  <!-- CSS flaticon -->
   <link rel="stylesheet" href="css/flaticon.css">
   <link rel="stylesheet" href="css/themify-icons.css">
-  <!-- font awesome CSS -->
+  <!-- CSS font awesome -->
   <link rel="stylesheet" href="css/magnific-popup.css">
-  <!-- swiper CSS -->
-  <link rel="stylesheet" href="css/slick.css">
+  <!-- CSS swiper -->
+  <link rel="stylesheet" href="css/swiper.min.css">
   <link rel="stylesheet" href="css/price_rangs.css">
-  <!-- style CSS -->
+  <!-- CSS style -->
   <link rel="stylesheet" href="css/style.css">
   <style>
     .header_bg {
@@ -96,8 +96,8 @@
 
     <?php include 'header.php';?>
 
-  <!--================Home Banner Area =================-->
-  <!-- breadcrumb start-->
+  <!--================Khu vực banner trang chủ =================-->
+  <!-- Bắt đầu breadcrumb-->
   <section class="breadcrumb header_bg">
         <div class="container">
             <div class="row justify-content-center a2">
@@ -107,16 +107,16 @@
             </div>
         </div>
     </section>
-  <!-- breadcrumb end-->
+  <!-- Kết thúc breadcrumb-->
 
-  <!--================Cart Area =================-->
+  <!--================Khu vực giỏ hàng =================-->
   <section class="cart_area padding_top1">
     <div class="container">
         <?php if ($loggedIn && $idtaikhoan !== null) : ?>
             <?php
-                // Fetch orders for the logged-in user, status != 0 means it's not an active cart
+                // Lấy đơn hàng cho người dùng đã đăng nhập, status != 0 nghĩa là không phải giỏ hàng đang hoạt động
                 $orders = selectAll(
-                    "SELECT id, thoigian, status, tongtien, diachi, phuongthuc_thanhtoan FROM donhang WHERE id_taikhoan = ? AND status != 0 ORDER BY thoigian DESC", 
+                    "SELECT id, thoigian, status, tongtien, diachi FROM donhang WHERE id_taikhoan = ? AND status != 0 ORDER BY thoigian DESC",
                     [$idtaikhoan]
                 );
 
@@ -126,19 +126,14 @@
                         $orderTime = date("d/m/Y H:i:s", strtotime($order['thoigian']));
                         $orderStatus = $order['status'];
                         $orderTotal = $order['tongtien'];
-                        $orderAddress = !empty($order['diachi']) ? htmlspecialchars($order['diachi']) : htmlspecialchars($diachitaikhoan); // Use order specific address if available
-                        $orderPaymentMethod = $order['phuongthuc_thanhtoan'];
+                        $orderAddress = !empty($order['diachi']) ? htmlspecialchars($order['diachi']) : htmlspecialchars($diachitaikhoan); // Sử dụng địa chỉ cụ thể của đơn hàng nếu có
 
                         $statusText = '';
                         $statusClass = '';
                         switch ($orderStatus) {
-                            case 1: // Chờ Xác Nhận (COD or Bank Transfer confirmed by Admin)
+                            case 1: // Chờ Xác Nhận (COD hoặc Chuyển khoản đã được Admin xác nhận)
                                 $statusText = 'Chờ Xác Nhận';
                                 $statusClass = 'text-info';
-                                break;
-                            case 2: // Chờ Thanh Toán CK
-                                $statusText = 'Chờ Thanh Toán Chuyển Khoản';
-                                $statusClass = 'text-warning';
                                 break;
                             case 3: // Đang Giao
                                 $statusText = 'Đang Giao';
@@ -210,8 +205,7 @@
                         <?php endforeach; ?>
                         <tr class="bottom_button">
                             <td colspan="2">
-                                <strong>Địa chỉ nhận hàng:</strong> <?= $orderAddress ?> <br/>
-                                <strong>Hình thức thanh toán:</strong> <?= htmlspecialchars($orderPaymentMethod) ?>
+                                <strong>Địa chỉ nhận hàng:</strong> <?= $orderAddress ?>
                             </td>
                             <td class="text-right"><h5>Tổng cộng đơn:</h5></td>
                             <td class="text-right"><h5><?= number_format($orderTotal) ?>đ</h5></td>
@@ -220,53 +214,8 @@
                         </tbody>
                     </table>
 
-                    <?php if ($orderStatus == 2 && $orderPaymentMethod == "Bank Transfer") : ?>
-                    <div class="text-left mb-2 mt-2"> <!-- Button container -->
-                        <button type="button" class="btn_1" onclick="togglePaymentDetails('<?= $orderId ?>', this)" style="padding: 8px 15px; font-size: 0.9rem;">
-                            Hiện thông tin thanh toán
-                        </button>
-                    </div>
-                    <div id="paymentDetails_<?= $orderId ?>" class="bank-transfer-details-history" style="display:none;">
-                        <h6 class="mb-3" style="color: #dc3545;"><i class="fa fa-hourglass-half"></i> Vui lòng hoàn tất thanh toán cho đơn hàng này:</h6>
-                        <div class="card shadow rounded-lg p-3" style="background: #fff; border: none;">
-                            <div class="row align-items-center">
-                                <div class="col-md-7">
-                                    <h5 class="mb-2" style="color: #5e2ced;">
-                                        <i class="fa fa-university"></i> Thông tin chuyển khoản
-                                    </h5>
-                                    <ul class="list-unstyled" style="font-size: 1.0rem;">
-                                        <li class="mb-2"><strong>Ngân hàng:</strong> <span style="color:#2d9cdb;">Vietcombank</span></li>
-                                        <li class="mb-2"><strong>Chủ tài khoản:</strong> <span>Bùi Ngọc Vũ</span></li>
-                                        <li class="mb-2">
-                                            <strong>Số tài khoản:</strong> 
-                                            <span id="stk_<?= $orderId ?>" style="font-weight: bold; color: #e74c3c;">9399564786</span>
-                                            <button class="btn btn-sm btn-outline-primary ml-2" type="button" onclick="copyToClipboard('stk_<?= $orderId ?>')" title="Sao chép số tài khoản"><i class="fa fa-copy"></i></button>
-                                        </li>
-                                        <li class="mb-2">
-                                            <strong>Số tiền:</strong> 
-                                            <span style="font-weight: bold; color: #27ae60;"><?= number_format($orderTotal) ?> đ</span>
-                                        </li>
-                                        <li class="mb-2">
-                                            <strong>Nội dung CK:</strong> 
-                                            <span id="noidungck_<?= $orderId ?>" style="font-weight: bold; color: #5e2ced;">Thanh toan don hang #<?= $orderId ?></span>
-                                            <button class="btn btn-sm btn-outline-primary ml-2" type="button" onclick="copyToClipboard('noidungck_<?= $orderId ?>')" title="Sao chép nội dung"><i class="fa fa-copy"></i></button>
-                                        </li>
-                                    </ul>
-                                </div>
-                                <div class="col-md-5 text-center">
-                                    <div class="mb-2">
-                                        <strong>Quét mã QR để thanh toán (VietQR):</strong>
-                                    </div>
-                                    <img src="img/qr_code_bank.png" alt="QR Code Thanh Toán Ngân Hàng" class="img-fluid rounded border" style="max-width: 180px;">
-                                    <div class="small text-muted mt-2">Dùng app ngân hàng để quét mã QR.</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <?php endif; ?>
-
-                </div> <!-- table-responsive end -->
-            </div> <!-- order-card end -->
+                </div> <!-- Kết thúc table-responsive -->
+            </div> <!-- Kết thúc order-card -->
             <?php
                     endforeach;
                 else :
@@ -285,13 +234,13 @@
                 <h2>Vui lòng <a href="login.php">đăng nhập</a> để xem lịch sử đặt hàng.</h2>
             </div>
         <?php endif; ?>
-    </div> <!-- container end -->
+    </div> <!-- Kết thúc container -->
   </section>
 
-  <!--================login_part end =================-->
+  <!--================Kết thúc khu vực đăng nhập =================-->
 
 
-  <!-- jquery plugins here-->
+  <!-- các plugin jquery ở đây-->
   <!-- jquery -->
   <script src="js/jquery-1.12.1.min.js"></script>
   <!-- popper js -->
@@ -320,41 +269,10 @@
   <script src="js/price_rangs.js"></script>
   <!-- custom js -->
   <script src="js/custom.js"></script>
-  <script>
-  function copyToClipboard(elementId) {
-    var textEl = document.getElementById(elementId);
-    if (textEl) {
-        var text = textEl.innerText;
-        navigator.clipboard.writeText(text)
-        .then(() => {
-            alert('Đã sao chép: ' + text);
-        })
-        .catch(err => {
-            console.error('Lỗi khi sao chép: ', err);
-            alert('Lỗi khi sao chép. Vui lòng thử lại hoặc sao chép thủ công.');
-        });
-    } else {
-        console.error('Không tìm thấy element với ID: ' + elementId);
-        alert('Có lỗi xảy ra, không thể sao chép.');
-    }
-  }
-
-  function togglePaymentDetails(orderId, buttonElement) {
-    var detailsDiv = document.getElementById('paymentDetails_' + orderId);
-    if (detailsDiv) {
-        if (detailsDiv.style.display === 'none') {
-            detailsDiv.style.display = 'block';
-            buttonElement.textContent = 'Ẩn thông tin thanh toán';
-        } else {
-            detailsDiv.style.display = 'none';
-            buttonElement.textContent = 'Hiện thông tin thanh toán';
-        }
-    }
-  }
-  </script>
-
-  <?php include 'footer.php';?>
   
+  <div style="clear: both;"></div>
+  <?php include 'footer.php';?>
+
 </body>
 
 </html>

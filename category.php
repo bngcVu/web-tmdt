@@ -10,30 +10,30 @@
 <html lang="zxx">
 
 <head>
-    <!-- Required meta tags -->
+    <!-- Thẻ meta cần thiết -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>Sản phẩm</title>
     <link rel="icon" href="img/logos.png">
-    <!-- Bootstrap CSS -->
+    <!-- CSS của Bootstrap -->
     <link rel="stylesheet" href="css/bootstrap.min.css">
-    <!-- animate CSS -->
+    <!-- CSS animation -->
     <link rel="stylesheet" href="css/animate.css">
-    <!-- owl carousel CSS -->
+    <!-- CSS owl carousel -->
     <link rel="stylesheet" href="css/owl.carousel.min.css">
-    <!-- nice select CSS -->
+    <!-- CSS nice select -->
     <link rel="stylesheet" href="css/nice-select.css">
-    <!-- font awesome CSS -->
+    <!-- CSS font awesome -->
     <link rel="stylesheet" href="css/all.css">
-    <!-- flaticon CSS -->
+    <!-- CSS flaticon -->
     <link rel="stylesheet" href="css/flaticon.css">
     <link rel="stylesheet" href="css/themify-icons.css">
-    <!-- font awesome CSS -->
+    <!-- CSS font awesome -->
     <link rel="stylesheet" href="css/magnific-popup.css">
-    <!-- swiper CSS -->
+    <!-- CSS swiper -->
     <link rel="stylesheet" href="css/slick.css">
     <link rel="stylesheet" href="css/price_rangs.css">
-    <!-- style CSS -->
+    <!-- CSS style -->
     <link rel="stylesheet" href="css/style.css">
 </head>
 <style>
@@ -61,8 +61,8 @@
 
     <?php include 'header.php';?>
 
-  <!--================Home Banner Area =================-->
-  <!-- breadcrumb start-->
+  <!--================Khu vực banner trang chủ =================-->
+  <!-- Bắt đầu breadcrumb-->
   <section class="breadcrumb header_bg">
         <div class="container">
             <div class="row justify-content-center a2">
@@ -72,9 +72,9 @@
             </div>
         </div>
     </section>
-  <!-- breadcrumb end-->
+  <!-- Kết thúc breadcrumb-->
 
-    <!--================Category Product Area =================-->
+    <!--================Khu vực sản phẩm theo danh mục =================-->
     <section class="cat_product_area ">
         <div class="container">
             <div class="row">
@@ -99,7 +99,7 @@
 
                         <!-- <aside class="left_widgets p_filter_widgets">
                             <div class="l_w_title">
-                                <h3>Product filters</h3>
+                                <h3>Bộ lọc sản phẩm</h3>
                             </div>
                             <div class="widgets_inner">
                                 <ul class="list">
@@ -147,18 +147,18 @@
                         <div class="col-lg-12">
                             <div class="product_top_bar d-flex justify-content-between align-items-center">
                                 <!-- <div class="single_product_menu">
-                                    <p><span>10000 </span> Prodict Found</p>
+                                    <p><span>10000 </span> Sản phẩm được tìm thấy</p>
                                 </div>
                                 <div class="single_product_menu d-flex">
-                                    <h5>short by : </h5>
+                                    <h5>Sắp xếp theo : </h5>
                                     <select>
-                                        <option data-display="Select">name</option>
-                                        <option value="1">price</option>
-                                        <option value="2">product</option>
+                                        <option data-display="Chọn">Tên</option>
+                                        <option value="1">Giá</option>
+                                        <option value="2">Sản phẩm</option>
                                     </select>
                                 </div>
                                 <div class="single_product_menu d-flex">
-                                    <h5>show :</h5>
+                                    <h5>Hiển thị :</h5>
                                     <div class="top_pageniation">
                                         <ul>
                                             <li>1</li>
@@ -169,7 +169,7 @@
                                 </div>
                                 <div class="single_product_menu d-flex">
                                     <div class="input-group">
-                                        <input type="text" class="form-control" placeholder="search" aria-describedby="inputGroupPrepend">
+                                        <input type="text" class="form-control" placeholder="tìm kiếm" aria-describedby="inputGroupPrepend">
                                         <div class="input-group-prepend">
                                             <span class="input-group-text" id="inputGroupPrepend"><i
                                                     class="ti-search"></i></span>
@@ -230,7 +230,7 @@
                                                 <li class="page-item"><a class="page-link" href="category.php?id=<?= $getid?>&per_page=<?=$item_per_page?>&page=<?=$num?>"><?=$num?></a></li>
                                                 <?php } ?>
                                             <?php 
-                                            } 
+                                            }
                                             else{ 
                                             ?>
                                                 <strong class="page-item"><a class="page-link"><?=$num?></a></strong>
@@ -260,9 +260,9 @@
             </div>
         </div>
     </section>
-    <!--================End Category Product Area =================-->
+    <!--================Kết thúc khu vực sản phẩm theo danh mục =================-->
 
-    <!-- product_list part start-->
+    <!-- Bắt đầu phần product_list -->
     <section class="product_list best_seller">
         <div class="container">
             <div class="row justify-content-center">
@@ -297,10 +297,10 @@
             </div>
         </div>
     </section>
-    <!-- product_list part end-->
+    <!-- Kết thúc phần product_list -->
 
 
-    <!-- jquery plugins here-->
+    <!-- các plugin jquery ở đây-->
     <script src="js/jquery-1.12.1.min.js"></script>
     <!-- popper js -->
     <script src="js/popper.min.js"></script>
@@ -317,14 +317,23 @@
     <script src="js/jquery.nice-select.min.js"></script>
     <!-- slick js -->
     <script src="js/slick.min.js"></script>
+    <!-- counterup js -->
     <script src="js/jquery.counterup.min.js"></script>
+    <!-- waypoints js -->
     <script src="js/waypoints.min.js"></script>
+    <!-- contact js -->
     <script src="js/contact.js"></script>
+    <!-- ajaxchimp js -->
     <script src="js/jquery.ajaxchimp.min.js"></script>
+    <!-- form js -->
     <script src="js/jquery.form.js"></script>
+    <!-- validate js -->
     <script src="js/jquery.validate.min.js"></script>
+    <!-- mail script js -->
     <script src="js/mail-script.js"></script>
+    <!-- stellar js -->
     <script src="js/stellar.js"></script>
+    <!-- price rangs js -->
     <script src="js/price_rangs.js"></script>
     <!-- custom js -->
     <script src="js/custom.js"></script>

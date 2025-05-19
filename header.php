@@ -1,4 +1,6 @@
 <?php
+    include_once './connect.php'; // Đảm bảo include connect.php chỉ 1 lần
+
     if (isset($_GET["checkout"])) {
         setcookie("user", "", time() - 3600, '/'); 
         header('Location: index.php');
@@ -6,7 +8,7 @@
     }
 ?>
 
-    <!--::header part start::-->
+    <!--::Bắt đầu phần header::-->
     <section class="main_menu home_menu">
         <div class="container">
             <div class="row align-items-center">
@@ -32,16 +34,16 @@
                                 <?php 
                                     if (isset($_COOKIE["user"])) {
                                         $taikhoan = $_COOKIE["user"];
-                                        $ten = 'Khách'; // Default name
-                                        $anh = null;    // Default avatar
-                                        $phanquyen = 0; // Default to no admin rights
-                                        $id_nguoidung = null; // Initialize user ID
+                                        $ten = 'Khách'; // Tên mặc định
+                                        $anh = null;    // Ảnh đại diện mặc định
+                                        $phanquyen = 0; // Mặc định không có quyền admin
+                                        $id_nguoidung = null; // Khởi tạo ID người dùng
 
-                                        // Use prepared statement to get user details
+                                        // Dùng prepared statement để lấy thông tin người dùng (bảo mật)
                                         $userData = selectAll("SELECT id, hoten, anh, phanquyen FROM taikhoan WHERE taikhoan = ?", [$taikhoan]);
                                         if (!empty($userData)) {
                                             $userItem = $userData[0];
-                                            $id_nguoidung = $userItem['id']; // Store user ID for cart logic
+                                            $id_nguoidung = $userItem['id']; // Lưu ID người dùng cho logic giỏ hàng
                                             $ten = $userItem['hoten'];
                                             $anh = $userItem['anh'];
                                             $phanquyen = $userItem['phanquyen'];
@@ -93,14 +95,14 @@
                                 <a class="" href="cart.php" id="navbarDropdown3" role="button" > <!-- data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" -->
                                     <i class="fa fa-cart-plus"style="font-size:20px"></i>
                                     <?php 
-                                        // Ensure $id_nguoidung is set from the previous block if user is logged in
+                                        // Đảm bảo $id_nguoidung đã được lấy từ block trên nếu user đã đăng nhập
                                         if (isset($_COOKIE["user"]) && $id_nguoidung !== null) {
-                                            // Fetch active cart for the user
+                                            // Lấy giỏ hàng (đơn hàng status = 0) của người dùng
                                             $activeCart = selectAll("SELECT id FROM donhang WHERE id_taikhoan = ? AND status = 0 LIMIT 1", [$id_nguoidung]);
                                             if (!empty($activeCart)) {
                                                 $id_donhang = $activeCart[0]['id'];
-                                                // Count items in the active cart
-                                                // Assuming your rowCount function is designed to return the number of rows for a SELECT query
+                                                // Đếm số lượng sản phẩm trong giỏ hàng
+                                                // Giả định hàm rowCount trả về số dòng cho query SELECT
                                                 $itemCountInCart = rowCount("SELECT id FROM ctdonhang WHERE id_donhang = ?", [$id_donhang]);
                                                 if ($itemCountInCart > 0) {
                                                 ?>
@@ -108,16 +110,16 @@
                                                 <?php 
                                                 } else {
                                                 ?>
-                                                    <span></span> <!-- Or remove if you prefer no output -->
+                                                    <span></span> <!-- Hoặc có thể xóa dòng này nếu không cần output -->
                                                 <?php
                                                 }
                                             } else {
                                             ?>
-                                                <span></span> <!-- Or remove if you prefer no output -->
+                                                <span></span> <!-- Hoặc có thể xóa dòng này nếu không cần output -->
                                             <?php
                                             }
                                         }
-                                        // If user is not logged in or $id_nguoidung is null, no badge will be shown.
+                                        // Nếu chưa đăng nhập hoặc không có ID người dùng, không hiển thị badge.
                                     ?>
                                 </a>
                             </div>
@@ -136,7 +138,48 @@
             </div>
         </div>
     </section>
-    <!-- Header part end-->
+    <!-- Kết thúc phần Header-->
+
+<!-- các plugin jquery ở đây-->
+<!-- jquery -->
+<script src="js/jquery-1.12.1.min.js"></script>
+<!-- popper js -->
+<script src="js/popper.min.js"></script>
+<!-- bootstrap js -->
+<script src="js/bootstrap.min.js"></script>
+<!-- easing js -->
+<script src="js/jquery.magnific-popup.js"></script>
+<!-- swiper js -->
+<script src="js/swiper.min.js"></script>
+<!-- swiper js -->
+<script src="js/masonry.pkgd.js"></script>
+<!-- particles js -->
+<script src="js/owl.carousel.min.js"></script>
+<!-- owl carousel js -->
+<script src="js/jquery.nice-select.min.js"></script>
+<!-- nice select js -->
+<script src="js/slick.min.js"></script>
+<!-- slick js -->
+<script src="js/jquery.counterup.min.js"></script>
+<!-- counterup js -->
+<script src="js/waypoints.min.js"></script>
+<!-- waypoints js -->
+<script src="js/contact.js"></script>
+<!-- contact js -->
+<script src="js/jquery.ajaxchimp.min.js"></script>
+<!-- ajaxchimp js -->
+<script src="js/jquery.form.js"></script>
+<!-- form js -->
+<script src="js/jquery.validate.min.js"></script>
+<!-- validate js -->
+<script src="js/mail-script.js"></script>
+<!-- mail script js -->
+<script src="js/stellar.js"></script>
+<!-- stellar js -->
+<script src="js/price_rangs.js"></script>
+<!-- price rangs js -->
+<!-- custom js -->
+<script src="js/custom.js"></script>
 
 <script type="text/javascript">
 $(document).ready(function() {
@@ -177,3 +220,18 @@ $(document).ready(function() {
   });
 });
 </script>
+
+<style>
+body {
+    -webkit-user-select: none;  /* Safari */
+    -ms-user-select: none;      /* Internet Explorer/Edge */
+    user-select: none;          /* Non-prefixed version, currently supported by Chrome, Edge, Opera and Firefox */
+}
+.header_bg {
+    background-color: #ecfdff;
+}
+</style>
+
+</body>
+
+</html>

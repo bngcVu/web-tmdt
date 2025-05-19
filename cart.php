@@ -1,12 +1,12 @@
 <?php 
-session_start(); // Add session_start for potential future use and consistency
+session_start(); // Bắt đầu session
 include './connect.php';  
 ?>
 <!doctype html>
 <html lang="zxx">
 
 <head>
-  <!-- Required meta tags -->
+  <!-- Các thẻ meta cần thiết -->
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <title>Smobile</title>
@@ -23,10 +23,12 @@ include './connect.php';
   <link rel="stylesheet" href="css/all.css">
   <!-- flaticon CSS -->
   <link rel="stylesheet" href="css/flaticon.css">
+  <!-- themify-icons CSS -->
   <link rel="stylesheet" href="css/themify-icons.css">
-  <!-- font awesome CSS -->
+  <!-- font awesome CSS (lặp lại, có thể là lỗi copy/paste) -->
   <link rel="stylesheet" href="css/magnific-popup.css">
   <!-- swiper CSS -->
+  <link rel="stylesheet" href="css/swiper.min.css">
   <link rel="stylesheet" href="css/slick.css">
   <link rel="stylesheet" href="css/price_rangs.css">
   <!-- style CSS -->
@@ -58,7 +60,7 @@ include './connect.php';
     <?php include 'header.php';?>
 
   <!--================Home Banner Area =================-->
-  <!-- breadcrumb start-->
+  <!-- Bắt đầu breadcrumb -->
   <section class="breadcrumb header_bg">
         <div class="container">
             <div class="row justify-content-center a2">
@@ -67,15 +69,15 @@ include './connect.php';
             </div>
         </div>
     </section>
-  <!-- breadcrumb end-->
+  <!-- Kết thúc breadcrumb -->
 
-  <!--================Cart Area =================-->
+  <!--================Bắt đầu Cart Area =================-->
   <section class="cart_area padding_top1">
     <div class="container">
         <?php
         $idtaikhoan = null;
         $diachitaikhoan = '';
-        $idDh = null; // Initialize $idDh
+        $idDh = null; // Khởi tạo biến $idDh
         $showBankTransferInfo = false;
         $order_total_bank = 0;
         $order_diachi_bank = '';
@@ -88,40 +90,158 @@ include './connect.php';
                 $idtaikhoan = $user['id'];
                 $diachitaikhoan = $user['diachi'];
 
-                // Fetch active order ID for the logged-in user
+                // Lấy ID đơn hàng đang hoạt động của người dùng đã đăng nhập
                 $activeOrderData = selectAll("SELECT id FROM donhang WHERE id_taikhoan = ? AND status = 0", [$idtaikhoan]);
                 if (!empty($activeOrderData)) {
                     $idDh = $activeOrderData[0]['id'];
+                } else {
+                    // Nếu không có đơn hàng đang hoạt động, tạo mới một đơn
+                    $insertNewOrder = exSQL("INSERT INTO donhang (id_taikhoan, status, tongtien) VALUES (?, 0, 0)", [$idtaikhoan]);
+                    if ($insertNewOrder) {
+                        // Lấy ID của đơn hàng vừa tạo
+                        $newOrderData = selectAll("SELECT id FROM donhang WHERE id_taikhoan = ? AND status = 0 ORDER BY id DESC LIMIT 1", [$idtaikhoan]);
+                        if (!empty($newOrderData)) {
+                            $idDh = $newOrderData[0]['id'];
+                        } else {
+                             // Log lỗi nếu không lấy được ID đơn hàng mới
+                            error_log("Lỗi: Không lấy được ID của đơn hàng mới tạo cho user " . $idtaikhoan);
+                        }
+                    } else {
+                        // Log lỗi nếu không tạo được đơn hàng mới
+                         error_log("Lỗi: Không tạo được đơn hàng mới cho user " . $idtaikhoan);
+                    }
                 }
             } else {
-                // Cookie exists but user not in DB, potentially an old cookie or an issue
-                // For now, treat as not logged in for cart purposes
+                // Cookie tồn tại nhưng không tìm thấy user trong DB (có thể do cookie cũ hoặc lỗi)
+                // Tạm thời coi như chưa đăng nhập cho mục đích xử lý giỏ hàng
                 $idtaikhoan = null; 
             }
         }
 
-        // Handle product removal - ensure $idDh is available
+        // Xử lý xóa sản phẩm - đảm bảo có $idDh và $idtaikhoan
         if (isset($_GET['removeproduct']) && $idDh !== null && $idtaikhoan !== null) {
             $removeProductId = filter_var($_GET['removeproduct'], FILTER_VALIDATE_INT);
             if ($removeProductId) {
+                // Dùng Prepared Statements cho an toàn
                 exSQL("DELETE FROM ctdonhang WHERE id_donhang = ? AND id_sanpham = ?", [$idDh, $removeProductId]);
                 header('location:cart.php');
                 exit;
             }
         }
 
-        if ($idtaikhoan !== null && empty($showBankTransferInfo)) : // User is considered logged in and user data is fetched
+        // Xử lý cập nhật số lượng (nếu có nút cập nhật được nhấn)
+        if (isset($_POST['capnhat']) && isset($_POST['soluong']) && $idDh !== null) {
+            foreach ($_POST['soluong'] as $idSp => $soLuongMoi) {
+                $idSp = filter_var($idSp, FILTER_VALIDATE_INT);
+                $soLuongMoi = max(1, min(100, (int)$soLuongMoi)); // Làm sạch và giới hạn số lượng
+                 if ($idSp !== false) {
+                    // Dùng Prepared Statements cho an toàn
+                    exSQL("UPDATE ctdonhang SET soluong = ? WHERE id_donhang = ? AND id_sanpham = ?", [$soLuongMoi, $idDh, $idSp]);
+                 }
+            }
+            header('Location: cart.php');
+            exit;
+        }
+
+        // Xử lý đặt hàng
+        if (isset($_POST["dathang"])) {
+            if (isset($idtaikhoan) && isset($idDh)) {
+                $diachi = trim($_POST["diachi"]);
+                // $today nên được định nghĩa sớm hơn trong script, ví dụ ở đầu file
+                $today = date("Y-m-d H:i:s"); 
+                
+                // Kiểm tra giỏ hàng có sản phẩm không
+                $cartItems = selectAll("SELECT * FROM ctdonhang WHERE id_donhang=?", [$idDh]);
+                if (empty($cartItems)) {
+                    echo "<script>
+                        alert('Giỏ hàng của bạn trống không thể đặt hàng.');
+                        window.location.href='cart.php';
+                    </script>";
+                    exit;
+                }
+
+                // Tính tổng tiền
+                $tongcong_final = 0;
+                foreach ($cartItems as $item) {
+                    $tongcong_final += $item['soluong'] * $item['gia'];
+                }
+
+                // Kiểm tra địa chỉ
+                if (empty($diachi)) {
+                    echo "<script>
+                        alert('Vui lòng nhập địa chỉ nhận hàng.');
+                        window.location.href='cart.php';
+                    </script>";
+                    exit;
+                }
+
+                // Mặc định thanh toán COD và đặt trạng thái 1 (Đã xác nhận/Đang xử lý)
+                $new_status = 1;
+                $alert_message = "Đặt hàng thành công! Vui lòng chuẩn bị tiền để thanh toán khi nhận hàng.";
+                
+                // Cập nhật đơn hàng - Dùng Prepared Statements cho an toàn
+                $success = exSQL(
+                    "UPDATE donhang SET 
+                        diachi = ?, 
+                        thoigian = ?, 
+                        tongtien = ?, 
+                        status = ? 
+                    WHERE id = ? AND id_taikhoan = ? AND status = 0",
+                    [$diachi, $today, $tongcong_final, $new_status, $idDh, $idtaikhoan]
+                );
+
+                if ($success) {
+                    // Tạo giỏ hàng mới cho người dùng
+                    $createNewCart = exSQL(
+                        "INSERT INTO donhang (id_taikhoan, status, tongtien) VALUES (?, 0, 0)",
+                        [$idtaikhoan]
+                    );
+
+                    if ($createNewCart) {
+                        echo "<script>
+                            alert('{$alert_message}');
+                            window.location.href='history.php';
+                        </script>";
+                    } else {
+                        // Log lỗi nếu không tạo được giỏ hàng mới
+                        error_log("Lỗi: Không tạo được giỏ hàng mới sau khi đặt hàng thành công cho user " . $idtaikhoan);
+                        echo "<script>
+                            alert('Đặt hàng thành công nhưng không tạo được giỏ hàng mới. Vui lòng liên hệ hỗ trợ.');
+                            window.location.href='history.php';
+                        </script>";
+                    }
+                } else {
+                    // Log lỗi nếu không cập nhật được đơn hàng
+                     error_log("Lỗi: Cập nhật đơn hàng " . $idDh . " cho user " . $idtaikhoan . " thất bại");
+                    echo "<script>
+                        alert('Đặt hàng thất bại. Vui lòng thử lại.\nChi tiết lỗi có thể xem trong log server.'); // Thông báo thân thiện hơn
+                        window.location.href='cart.php';
+                    </script>";
+                }
+                exit;
+            } else {
+                echo "<script>
+                    alert('Vui lòng đăng nhập để đặt hàng.');
+                    window.location.href='login.php';
+                </script>";
+                exit;
+            }
+        }
+
+        // Phần hiển thị nội dung giỏ hàng (chỉ hiển thị nếu người dùng đã đăng nhập)
+        if ($idtaikhoan !== null) : // Người dùng đã đăng nhập
         ?>
-            <form class="cart_inner" method="post" action="cart.php">
+            <form class="cart_inner" method="post" action="cart.php"> <!-- Action form trỏ về chính nó -->
                 <div class="table-responsive">
                     <a href="history.php" class="btn_1" style="float:right; margin-bottom:20px;">Lịch sử đặt hàng</a>
                     <?php
                         $cartItems = [];
-                        if ($idDh !== null) { // If an active order exists
-                            $cartItems = selectAll("SELECT * FROM ctdonhang WHERE id_donhang = ?", [$idDh]);
-                        }
+                         if ($idDh !== null) { // Chỉ lấy nếu có đơn hàng đang hoạt động
+                             // Dùng Prepared Statements cho an toàn và JOIN để lấy tên/ảnh sản phẩm
+                             $cartItems = selectAll("SELECT ctdonhang.*, sanpham.ten, sanpham.anh1 FROM ctdonhang JOIN sanpham ON ctdonhang.id_sanpham = sanpham.id WHERE id_donhang = ?", [$idDh]);
+                         }
 
-                        if (!empty($cartItems)) :
+                        if (!empty($cartItems)) : // Nếu giỏ hàng có sản phẩm
                     ?>
                         <table class="table">
                             <thead>
@@ -130,7 +250,7 @@ include './connect.php';
                                 <th scope="col">Giá</th>
                                 <th scope="col">Số lượng</th>
                                 <th scope="col">Tổng</th>
-                                <th scope="col"></th> <!-- For delete button -->
+                                <th scope="col"></th> <!-- Cột cho nút xóa -->
                             </tr>
                             </thead>
                             <tbody>
@@ -139,26 +259,21 @@ include './connect.php';
                                 foreach ($cartItems as $item) :
                                     $idSp = $item['id_sanpham'];
                                     $soluongSp = $item['soluong'];
-                                    $giaSp = $item['gia'];
+                                    $giaSp = $item['gia']; // Giả định giá được lưu trong ctdonhang
                                     $tong = $soluongSp * $giaSp;
                                     $tongcong += $tong;
-
-                                    $productDetails = selectAll("SELECT ten, anh1 FROM sanpham WHERE id = ?", [$idSp]);
-                                    $tenSp = "Sản phẩm không xác định";
-                                    $anhSp = "default.png"; // Fallback image
-                                    if (!empty($productDetails)) {
-                                        $tenSp = $productDetails[0]['ten'];
-                                        $anhSp = $productDetails[0]['anh1'];
-                                    }
+                                    
+                                    $tenSp = htmlspecialchars($item['ten']);
+                                    $anhSp = htmlspecialchars($item['anh1']);
                             ?>
                             <tr>
                                 <td>
                                     <div class="media">
                                         <div class="d-flex">
-                                        <img src="img/product/<?= htmlspecialchars($anhSp) ?>" alt="<?= htmlspecialchars($tenSp) ?>" style="width:50px; height:50px;"/>
+                                        <img src="img/product/<?= $anhSp ?>" alt="<?= $tenSp ?>" style="width:50px; height:50px;"/>
                                         </div>
                                         <div class="media-body">
-                                            <p><?= htmlspecialchars($tenSp) ?></p>
+                                            <p><?= $tenSp ?></p>
                                         </div>
                                     </div>
                                 </td>
@@ -180,7 +295,9 @@ include './connect.php';
                             <?php endforeach; ?>
                             <tr class="bottom_button">
                                 <td></td>
-                                <td></td>
+                                <td>
+                                    <input class="btn_1" type="submit" name="capnhat" value="Cập nhật giỏ hàng" style="border: none"/>
+                                </td>
                                 <td><h5>Tổng cộng:</h5></td>
                                 <td><h5 id="cart-grand-total"><?= number_format($tongcong, 0, '.', '.') ?>đ</h5></td>
                                 <td></td>
@@ -197,58 +314,15 @@ include './connect.php';
                              <tr>
                                 <td colspan="5">
                                     <div class="checkout_btn_inner billing_details">
-                                        <h5>Chọn hình thức thanh toán:</h5>
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="radio" name="phuongthuc_thanhtoan" id="payment_cod" value="COD" checked required>
-                                            <label class="form-check-label" for="payment_cod">
-                                                Thanh toán khi nhận hàng (COD)
-                                            </label>
-                                        </div>
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="radio" name="phuongthuc_thanhtoan" id="payment_bank" value="Bank Transfer" required>
-                                            <label class="form-check-label" for="payment_bank">
-                                                Chuyển khoản ngân hàng
-                                            </label>
-                                        </div>
-                                        <div id="bankTransferInfo" style="display:none; margin-top: 20px;">
-                                            <div class="card shadow rounded-lg p-3" style="background: #fff; border: none;">
-                                                <div class="row align-items-center">
-                                                    <div class="col-md-7">
-                                                        <h5 class="mb-2" style="color: #5e2ced;">
-                                                            <i class="fa fa-university"></i> Thông tin chuyển khoản
-                                                        </h5>
-                                                        <ul class="list-unstyled" style="font-size: 1.08rem;">
-                                                            <li class="mb-2"><strong>Ngân hàng:</strong> <span style="color:#2d9cdb;">Vietcombank</span></li>
-                                                            <li class="mb-2"><strong>Chủ tài khoản:</strong> <span>Bùi Ngọc Vũ</span></li>
-                                                            <li class="mb-2">
-                                                                <strong>Số tài khoản:</strong> 
-                                                                <span id="stk" style="font-weight: bold; color: #e74c3c;">9399564786</span>
-                                                                <button class="btn btn-sm btn-outline-primary ml-2" type="button" onclick="copyToClipboard('stk')" title="Sao chép số tài khoản"><i class="fa fa-copy"></i></button>
-                                                            </li>
-                                                            <li class="mb-2">
-                                                                <strong>Số tiền:</strong> 
-                                                                <span style="font-weight: bold; color: #27ae60;"><?= isset($tongcong) ? number_format($tongcong) : '0' ?> đ</span>
-                                                            </li>
-                                                            <li class="mb-2">
-                                                                <strong>Nội dung CK:</strong> 
-                                                                <span id="noidungck" style="font-weight: bold; color: #5e2ced;">Thanh toan don hang #<?= $idDh ?? '' ?></span>
-                                                                <button class="btn btn-sm btn-outline-primary ml-2" type="button" onclick="copyToClipboard('noidungck')" title="Sao chép nội dung"><i class="fa fa-copy"></i></button>
-                                                            </li>
-                                                        </ul>
-                                                        <div class="alert alert-info mt-3" style="font-size: 0.97rem;">
-                                                            <i class="fa fa-info-circle"></i>
-                                                            Vui lòng chuyển khoản đúng thông tin trên trước khi nhấn Đặt Hàng!
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-5 text-center">
-                                                        <div class="mb-2">
-                                                            <strong>Quét mã QR để thanh toán (VietQR):</strong>
-                                                        </div>
-                                                        <img src="img/qr_code_bank.png" alt="QR Code Thanh Toán Ngân Hàng" class="img-fluid rounded border" style="max-width: 200px;">
-                                                        <div class="small text-muted mt-2">Dùng app ngân hàng để quét mã QR.<br>Nhớ kiểm tra lại số tiền và nội dung chuyển khoản.</div>
-                                                    </div>
-                                                </div>
-                                            </div>
+                                        <h5>Phương thức thanh toán:</h5>
+                                        <div class="alert alert-info" style="margin-top: 10px;">
+                                            <i class="fa fa-info-circle"></i>
+                                            <strong>Thanh toán khi nhận hàng (COD):</strong>
+                                            <ul style="margin-top: 10px; margin-bottom: 0;">
+                                                <li>Quý khách sẽ thanh toán tiền khi nhận được hàng</li>
+                                                <li>Nhân viên giao hàng sẽ thu tiền trực tiếp</li>
+                                                <li>Vui lòng kiểm tra hàng trước khi thanh toán</li>
+                                            </ul>
                                         </div>
                                     </div>
                                 </td>
@@ -260,94 +334,45 @@ include './connect.php';
                             <a class="btn_1" href="product.php">Tiếp Tục Mua Sắm</a>
                             <input class="btn_1" type='submit' name="dathang" value="Đặt Hàng" style="border: none"/>
                         </div>
-                    </div> <!-- table-responsive end -->
-                <?php else : // Cart is empty ?>
+                    </div> <!-- Kết thúc table-responsive -->
+                <?php else : // Giỏ hàng trống ?>
                     <div class="text-center">
                         <h2>Giỏ hàng của bạn đang trống</h2>
                         <a href="product.php" class="btn_1" style="margin-top:20px;">Mua Ngay</a>
                     </div>
                 <?php endif; ?>
             </form>
-        <?php else : // User is not logged in ?>
+        <?php else : // Người dùng chưa đăng nhập ?>
             <div class="text-center">
                 <h2>Vui lòng <a href="login.php">đăng nhập</a> để xem giỏ hàng và đặt hàng.</h2>
             </div>
         <?php
         endif; 
-        
-        if (isset($_POST["dathang"]) && $idtaikhoan !== null && $idDh !== null) {
-            $diachi = trim($_POST["diachi"]);
-            $phuongthuc_thanhtoan = $_POST["phuongthuc_thanhtoan"];
-            $today = date("Y-m-d H:i:s");
-            
-            $cartItemsForTotal = selectAll("SELECT soluong, gia FROM ctdonhang WHERE id_donhang = ?", [$idDh]);
-            $tongcong_final = 0;
-            if (!empty($cartItemsForTotal)) {
-                foreach($cartItemsForTotal as $itemForTotal){
-                    $tongcong_final += $itemForTotal['soluong'] * $itemForTotal['gia'];
-                }
+        ?>
 
-                if (empty($diachi)) {
-                     echo "<script>alert('Vui lòng nhập địa chỉ nhận hàng.'); location.href='cart.php';</script>";
-                     exit;
-                }
-
-                $new_status = 0; 
-                $alert_message = "";
-
-                if ($phuongthuc_thanhtoan == "Bank Transfer") {
-                    $new_status = 2; // 2 for "Awaiting Payment Confirmation"
-                    $alert_message = "Đơn hàng của bạn đã được ghi nhận và đang chờ xác nhận thanh toán. Vui lòng hoàn tất chuyển khoản theo thông tin đã hiển thị. Chúng tôi sẽ xử lý đơn hàng sau khi nhận được thanh toán.";
-                } else { // Assuming COD or other direct methods
-                    $new_status = 1; // 1 for "Order Confirmed/Processing"
-                    $alert_message = "Đặt hàng thành công!";
-                }
-                
-                $success = exSQL(
-                    "UPDATE donhang SET diachi = ?, thoigian = ?, tongtien = ?, phuongthuc_thanhtoan = ?, status = ? WHERE id = ? AND id_taikhoan = ? AND status = 0",
-                    [$diachi, $today, $tongcong_final, $phuongthuc_thanhtoan, $new_status, $idDh, $idtaikhoan]
-                );
-
-                if ($success) {
-                    // Create a new empty cart for the user
-                    exSQL("INSERT INTO donhang (id_taikhoan, status, tongtien) VALUES (?, 0, 0)", [$idtaikhoan]);
-                    echo "<script>alert('{$alert_message}'); location.href='history.php';</script>";
-                    exit;
-                } else {
-                    echo "<script>alert('Đặt hàng thất bại. Vui lòng thử lại.'); location.href='cart.php';</script>";
-                    exit;
-                }
-            } else {
-                // Cart became empty somehow before placing order
-                echo "<script>alert('Giỏ hàng của bạn trống không thể đặt hàng.'); location.href='cart.php';</script>";
-                exit;
-            }
-        }
-
-        if (isset($_POST['capnhat']) && isset($_POST['soluong']) && $idDh !== null) {
-            foreach ($_POST['soluong'] as $idSp => $soLuongMoi) {
-                $soLuongMoi = max(1, min(100, (int)$soLuongMoi));
-                exSQL("UPDATE ctdonhang SET soluong = ? WHERE id_donhang = ? AND id_sanpham = ?", [$soLuongMoi, $idDh, $idSp]);
-            }
-            header('Location: cart.php');
-            exit;
-        }
-    ?>
-    </div> <!-- container end -->
+    </div> <!-- Kết thúc container -->
   </section>
 
-  <!--================login_part end =================-->
+  <!--================Kết thúc Cart Area =================-->
 
 
-  <!-- jquery plugins here-->
+  <!-- jquery plugins tại đây-->
+  <!-- jquery -->
   <script src="js/jquery-1.12.1.min.js"></script>
+  <!-- popper js -->
   <script src="js/popper.min.js"></script>
+  <!-- bootstrap js -->
   <script src="js/bootstrap.min.js"></script>
+  <!-- easing js -->
   <script src="js/jquery.magnific-popup.js"></script>
+  <!-- swiper js -->
   <script src="js/swiper.min.js"></script>
+  <!-- swiper js -->
   <script src="js/masonry.pkgd.js"></script>
+  <!-- particles js -->
   <script src="js/owl.carousel.min.js"></script>S
   <script src="js/jquery.nice-select.min.js"></script>
+  <!-- slick js -->
   <script src="js/slick.min.js"></script>
   <script src="js/jquery.counterup.min.js"></script>
   <script src="js/waypoints.min.js"></script>
@@ -358,6 +383,7 @@ include './connect.php';
   <script src="js/mail-script.js"></script>
   <script src="js/stellar.js"></script>
   <script src="js/price_rangs.js"></script>
+  <!-- custom js -->
   <script src="js/custom.js"></script>
   <script>
   function copyToClipboard(elementId) {
@@ -391,7 +417,7 @@ include './connect.php';
     }
     codRadio.addEventListener('change', toggleBankInfo);
     bankRadio.addEventListener('change', toggleBankInfo);
-    toggleBankInfo(); // Initialize on page load
+    toggleBankInfo(); // Khởi tạo khi tải trang
 
     // Tính lại tổng tiền khi thay đổi số lượng
     const quantityInputs = document.querySelectorAll('.input-number');
