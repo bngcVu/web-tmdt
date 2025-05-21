@@ -1,5 +1,5 @@
 <?php 
-    include './connect.php';
+    include_once './connect.php';
     if (isset($_GET["id"])) {
         foreach (selectAll("SELECT * FROM danhmuc WHERE id={$_GET['id']}") as $item) {
            $tendanhmuc = $item['danhmuc'];

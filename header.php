@@ -66,7 +66,7 @@
                                             ?>
 
                                             <a class="dropdown-item" href="infor.php"> thông tin tài khoản</a>
-                                            <a class="dropdown-item" href="?checkout">đăng xuất</a>
+                                            <a class="dropdown-item" href="index.php?checkout">đăng xuất</a>
                                             
                                         </div>
                                     </li>
