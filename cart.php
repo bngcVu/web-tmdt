@@ -237,13 +237,60 @@
         <?php
         endif; 
         
-        if (isset($_POST["dathang"])) {
-            $diachi = $_POST["diachi"];
+        // Xử lý đặt hàng
+        if (isset($_POST["dathang"]) && $idtaikhoan !== null && $idDh !== null) {
+            $diachi = trim($_POST["diachi"]);
+            $phuongthuc_thanhtoan = "COD";
             $today = date("Y-m-d H:i:s");
-            selectall("UPDATE donhang SET diachi='$diachi',thoigian='$today', tongtien= $tongcong, status=1 WHERE id_taikhoan=$idtaikhoan && status=0");
-            echo "<script>alert('Đặt hàng thành công')
-                location.href='product.php'
-            </script>";
+            
+            // Tính tổng tiền đơn hàng
+            $cartItemsForTotal = selectAll("SELECT soluong, gia FROM ctdonhang WHERE id_donhang = ?", [$idDh]);
+            $tongcong_final = 0;
+            if (!empty($cartItemsForTotal)) {
+                foreach($cartItemsForTotal as $itemForTotal){
+                    $tongcong_final += $itemForTotal['soluong'] * $itemForTotal['gia'];
+                }
+
+                // Kiểm tra địa chỉ nhận hàng
+                if (empty($diachi)) {
+                     echo "<script>alert('Vui lòng nhập địa chỉ nhận hàng.'); location.href='cart.php';</script>";
+                     exit;
+                }
+
+                // Cập nhật trạng thái đơn hàng
+                $new_status = 1;
+                $alert_message = "Đặt hàng thành công!";
+                
+                // Cập nhật thông tin đơn hàng
+                $success = exSQL(
+                    "UPDATE donhang SET diachi = ?, thoigian = ?, tongtien = ?, phuongthuc_thanhtoan = ?, status = ? WHERE id = ? AND id_taikhoan = ? AND status = 0",
+                    [$diachi, $today, $tongcong_final, $phuongthuc_thanhtoan, $new_status, $idDh, $idtaikhoan]
+                );
+
+                if ($success) {
+                    // Tạo giỏ hàng mới cho người dùng
+                    exSQL("INSERT INTO donhang (id_taikhoan, status, tongtien) VALUES (?, 0, 0)", [$idtaikhoan]);
+                    echo "<script>alert('{$alert_message}'); location.href='history.php';</script>";
+                    exit;
+                } else {
+                    echo "<script>alert('Đặt hàng thất bại. Vui lòng thử lại.'); location.href='cart.php';</script>";
+                    exit;
+                }
+            } else {
+                // Cart became empty somehow before placing order
+                echo "<script>alert('Giỏ hàng của bạn trống không thể đặt hàng.'); location.href='cart.php';</script>";
+                exit;
+            }
+        }
+
+        // Xử lý cập nhật số lượng sản phẩm
+        if (isset($_POST['capnhat']) && isset($_POST['soluong']) && $idDh !== null) {
+            foreach ($_POST['soluong'] as $idSp => $soLuongMoi) {
+                $soLuongMoi = max(1, min(100, (int)$soLuongMoi));
+                exSQL("UPDATE ctdonhang SET soluong = ? WHERE id_donhang = ? AND id_sanpham = ?", [$soLuongMoi, $idDh, $idSp]);
+            }
+            header('Location: cart.php');
+            exit;
         }
     ?>
     </div> <!-- container end -->
