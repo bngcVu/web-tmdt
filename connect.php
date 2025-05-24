@@ -3,7 +3,7 @@ ob_start();
 
 try {
     // Kết nối đến cơ sở dữ liệu MySQL sử dụng PDO (PHP Data Objects).
-    // Thay đổi 'localhost', 'smobile', 'root', '' nếu thông tin đăng nhập của bạn khác.
+    // Thay đổi 'localhost', 'smobile', 'root', '' nếu thông tin đăng nhập của ng khác.
     // 'charset=utf8' đảm bảo hỗ trợ tiếng Việt và các ký tự đặc biệt khác.
     $conn = new PDO("mysql:host=localhost;dbname=smobile;charset=utf8", "root", "");
 
@@ -14,7 +14,6 @@ try {
 
 } catch (PDOException $e) {
     // Bắt ngoại lệ nếu kết nối cơ sở dữ liệu thất bại.
-    // Trong ứng dụng thực tế, bạn nên ghi lại lỗi này vào log thay vì hiển thị trực tiếp cho người dùng.
     echo "Lỗi Kết Nối Cơ Sở Dữ Liệu: " . $e->getMessage();
     // Dừng thực thi script nếu kết nối cơ sở dữ liệu thất bại.
     die();
@@ -50,12 +49,7 @@ function selectAll($sql, $params = []) {
     return $stmt ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
 }
 
-// Hàm đếm số lượng hàng bị ảnh hưởng bởi truy vấn (INSERT, UPDATE, DELETE).
-// Lưu ý: Đối với truy vấn SELECT, việc sử dụng rowCount() sau fetchAll thường đáng tin cậy hơn
-// hoặc sử dụng COUNT(*) trong câu lệnh SQL.
-// Hàm này sẽ trả về số lượng hàng bị ảnh hưởng cho INSERT, UPDATE, DELETE.
-// Đối với SELECT, nó phụ thuộc vào driver và có thể không đáng tin cậy.
-// Cách đáng tin cậy hơn để đếm cho SELECT là sử dụng SELECT COUNT(*) trong SQL.
+
 function rowCount($sql, $params = []) {
     // Thực thi truy vấn.
     $stmt = execute_query($sql, $params);
@@ -77,7 +71,6 @@ date_default_timezone_set('Asia/Ho_Chi_Minh');
 // $timestamp = time(); // $today hiện được đặt trong cart.php khi cần cho đơn hàng
 // $today = date('d-m-Y H:i:s', $timestamp); // Biến $today toàn cục này có thể không phải lúc nào cũng là thứ bạn cần.
 ?>
-
 
 
 

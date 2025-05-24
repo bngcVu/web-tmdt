@@ -153,7 +153,7 @@ if (isset($_GET["id"])) {
                                     <p>
                                         <?= htmlspecialchars($mota) ?>
                                     </p>
-                                    <form class="card_area d-flex justify-content-between align-items-center" action="detail.php?id=<?= $idSanpham ?>" method="POST">
+                                    <form class="card_area d-flex justify-content-between align-items-center" action="" method="POST">
                                         <div class="product_count">
                                             <span class="inumber-decrement"> <i class="ti-minus"></i></span>
                                             <input type="number" hidden name="giatien" value="<?= floatval($giatien) ?>">
@@ -182,20 +182,21 @@ if (isset($_GET["id"])) {
                                                                 if (!empty($cartItem)) {
                                                                     $new_soluong = $cartItem[0]['soluong'] + $soluong;
                                                                     exSQL("UPDATE ctdonhang SET soluong = ? WHERE id_donhang = ? AND id_sanpham = ?", [$new_soluong, $idDh, $idSanpham]);
+                                                                    echo "<script>alert('Đã cập nhật số lượng sản phẩm trong giỏ hàng!');</script>";
                                                                 } else {
                                                                     exSQL("INSERT INTO ctdonhang (id_donhang, id_sanpham, soluong, gia) VALUES(?,?,?,?)", [$idDh, $idSanpham, $soluong, $giatien_posted]);
+                                                                    echo "<script>alert('Đã thêm sản phẩm vào giỏ hàng!');</script>";
                                                                 }
                                                             } else {
-                                                                $success_new_order = exSQL("INSERT INTO donhang (id_taikhoan, status, tongtien, diachi, thoigian, phuongthuc_thanhtoan) VALUES(?,0,0,NULL,NULL,NULL)", [$id_nguoidung]);
+                                                                $success_new_order = exSQL("INSERT INTO donhang (id_taikhoan, status, tongtien) VALUES(?,0,0)", [$id_nguoidung]);
                                                                 if ($success_new_order) {
                                                                     $idDhmoi = $GLOBALS['conn']->lastInsertId();
                                                                     exSQL("INSERT INTO ctdonhang (id_donhang, id_sanpham, soluong, gia) VALUES(?,?,?,?)", [$idDhmoi, $idSanpham, $soluong, $giatien_posted]);
+                                                                    echo "<script>alert('Đã thêm sản phẩm vào giỏ hàng!');</script>";
                                                                 } else {
                                                                     echo "<script>alert('Lỗi khi tạo đơn hàng mới.')</script>";
                                                                 }
                                                             }
-                                                            header('Location: detail.php?id=' . $idSanpham . '&added=1');
-                                                            exit;
                                                         } else {
                                                             echo "<script>alert('Lỗi: Không tìm thấy người dùng.')</script>";
                                                         }
@@ -512,4 +513,3 @@ if (isset($_GET["id"])) {
 </body>
 
 </html>
-
