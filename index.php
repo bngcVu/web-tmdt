@@ -81,7 +81,7 @@
             </div>
             <div class="row align-items-center justify-content-between">
                 <?php 
-                    foreach (selectAll("SELECT * FROM sanpham ORDER BY luotxem DESC LIMIT 4 ") as $item) {
+                    foreach (selectAll("SELECT * FROM sanpham WHERE status = 0 ORDER BY luotxem DESC LIMIT 4 ") as $item) {
                 ?>
                 <div class="col-lg-6 col-sm-6">
                     <div class="single_feature_post_text">
@@ -113,7 +113,7 @@
                 <div class="col-lg-12">
                     <div class="best_product_slider owl-carousel">
                     <?php 
-                        foreach (selectAll("SELECT * FROM sanpham ORDER BY id DESC LIMIT 8 ") as $item) {
+                        foreach (selectAll("SELECT * FROM sanpham WHERE status = 0 ORDER BY id DESC LIMIT 8 ") as $item) {
                     ?>
                         <div class="single_product_item">
                             <a href="detail.php?id=<?= $item['id'] ?>" >
@@ -169,9 +169,4 @@
 
 
 </html>
-
-</html>
-<?php
-    include './connect.php';
-?>
 

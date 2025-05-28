@@ -10,7 +10,7 @@ if (isset($_GET["id"])) {
 
     exSQL("UPDATE sanpham SET luotxem=luotxem+1 WHERE id=?", [$idSanpham]);
 
-    $productData = selectAll("SELECT * FROM sanpham WHERE id=?", [$idSanpham]);
+    $productData = selectAll("SELECT * FROM sanpham WHERE id=? AND status=0", [$idSanpham]);
     
     if (!empty($productData)) {
         $row = $productData[0];
@@ -45,6 +45,16 @@ if (isset($_GET["id"])) {
     echo "Không có ID sản phẩm.";
     exit;
 }
+
+
+$admin_avatar_path = 'img/account/avt_shop.png'; // Ảnh mặc định cho admin
+if (isset($idtaikhoan) && $idtaikhoan !== null && $permission == 1) {
+    $adminAvatarData = selectAll("SELECT anh FROM taikhoan WHERE id = ?", [$idtaikhoan]);
+    if (!empty($adminAvatarData) && !empty($adminAvatarData[0]['anh'])) {
+        $admin_avatar_path = 'img/account/' . htmlspecialchars($adminAvatarData[0]['anh']);
+    }
+}
+
 ?>
 <!doctype html>
 <html lang="zxx">
@@ -365,7 +375,7 @@ if (isset($_GET["id"])) {
                                             ?>
                                             <div class="review_item reply d-flex">
                                                 <div>
-                                                    <img src="img/account/logos.png" alt="" >
+                                                    <img src="<?= $admin_avatar_path ?>" alt="Avatar Admin" style="width:60px; height:60px; object-fit: cover;">
                                                 </div>
                                                 <div class="ml-2">
                                                     <p class="font-weight-bold text-danger">Admin</p>
@@ -440,7 +450,7 @@ if (isset($_GET["id"])) {
                 <div class="col-lg-12">
                     <div class="best_product_slider owl-carousel">
                     <?php 
-                        foreach (selectAll("SELECT * FROM sanpham WHERE id_danhmuc = $cateid AND NOT(id = $idSanpham) ") as $item) {
+                        foreach (selectAll("SELECT * FROM sanpham WHERE id_danhmuc = $cateid AND NOT(id = $idSanpham) AND status = 0") as $item) {
                     ?>
                         <div class="single_product_item">
                             <a href="detail.php?id=<?= $item['id'] ?>" >
@@ -464,6 +474,7 @@ if (isset($_GET["id"])) {
     <!-- product_list part end-->
 
 
+    <?php include 'footer.php';?>
 
     <!-- jquery plugins here-->
     <!-- jquery -->

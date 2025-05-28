@@ -78,8 +78,6 @@
                                                 } else {
                                                     selectAll("INSERT INTO taikhoan VALUES (NULL,'$email','$matkhau','$ten','','$sdt','','0','0')");
                                                     $success = 'Đăng ký thành công, vui lòng đăng nhập';
-                                                    header('Location: login.php');
-                                                    exit;
                                                 }
                                             }
                                         } else {

@@ -240,10 +240,17 @@
         // Xử lý đặt hàng
         if (isset($_POST["dathang"]) && $idtaikhoan !== null && $idDh !== null) {
             $diachi = trim($_POST["diachi"]);
-            $phuongthuc_thanhtoan = "COD";
             $today = date("Y-m-d H:i:s");
             
-            // Tính tổng tiền đơn hàng
+            // Cập nhật số lượng sản phẩm trong giỏ hàng từ form trước khi đặt hàng
+            if (isset($_POST['soluong'])) {
+                foreach ($_POST['soluong'] as $idSp => $soLuongMoi) {
+                    $soLuongMoi = max(1, min(100, (int)$soLuongMoi));
+                    exSQL("UPDATE ctdonhang SET soluong = ? WHERE id_donhang = ? AND id_sanpham = ?", [$soLuongMoi, $idDh, $idSp]);
+                }
+            }
+
+            // Tính tổng tiền đơn hàng sau khi cập nhật số lượng
             $cartItemsForTotal = selectAll("SELECT soluong, gia FROM ctdonhang WHERE id_donhang = ?", [$idDh]);
             $tongcong_final = 0;
             if (!empty($cartItemsForTotal)) {
@@ -263,8 +270,8 @@
                 
                 // Cập nhật thông tin đơn hàng
                 $success = exSQL(
-                    "UPDATE donhang SET diachi = ?, thoigian = ?, tongtien = ?, phuongthuc_thanhtoan = ?, status = ? WHERE id = ? AND id_taikhoan = ? AND status = 0",
-                    [$diachi, $today, $tongcong_final, $phuongthuc_thanhtoan, $new_status, $idDh, $idtaikhoan]
+                    "UPDATE donhang SET diachi = ?, thoigian = ?, tongtien = ?, status = ? WHERE id = ? AND id_taikhoan = ? AND status = 0",
+                    [$diachi, $today, $tongcong_final, $new_status, $idDh, $idtaikhoan]
                 );
 
                 if ($success) {

@@ -8,15 +8,14 @@
         
         if ($permission==1) {
             if (isset($_GET["id"])) {
-              if(rowCount("SELECT * FROM sanpham WHERE id={$_GET['id']} && status=1 ")>0){
-                selectall("UPDATE sanpham SET status=0 WHERE id={$_GET["id"]} && status=1");
+              if(rowCount("SELECT * FROM sanpham WHERE id={$_GET['id']} AND status=1")>0){
+                selectall("UPDATE sanpham SET status=0 WHERE id={$_GET["id"]} AND status=1");
                 header('location:product.php');
               }
               else {
-                selectall("UPDATE sanpham SET status=1 WHERE id={$_GET["id"]} && status=0");
+                selectall("UPDATE sanpham SET status=1 WHERE id={$_GET["id"]} AND status=0");
                 header('location:product.php');
               }
-              
             }
 
             // biến phân trang trước khi sử dụng
@@ -65,7 +64,7 @@
 
                                         <?php 
                                         $stt=1;
-                                        $numrow = rowCount("SELECT * FROM sanpham WHERE status = 0");
+                                        $numrow = rowCount("SELECT * FROM sanpham");
                                         $totalpage = ceil($numrow / $item_per_page);
                                         foreach (selectAll("SELECT * FROM sanpham INNER JOIN danhmuc ON sanpham.id_danhmuc = danhmuc.id_dm LIMIT $item_per_page OFFSET $offset") as $row) {
                                         ?>

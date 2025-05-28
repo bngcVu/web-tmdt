@@ -14,10 +14,8 @@
                             <li><i class="fa fa-envelope"></i> Email: <a href="mailto:info@smobile.vn">info@smobile.vn</a></li>
                         </ul>
                         <div class="footer_social">
-                            <a href="#"><i class="fab fa-facebook-f"></i></a>
-                            <a href="#"><i class="fab fa-youtube"></i></a>
-                            <a href="#"><i class="fab fa-instagram"></i></a>
-                            <a href="#"><i class="fab fa-tiktok"></i></a>
+                            <a href="https://www.facebook.com/toilavuuuu"><i class="fab fa-facebook-f"></i></a>
+                            <a href="youhttps://www.instagram.com/htttp.yourname/"><i class="fab fa-instagram"></i></a>
                         </div>
                     </div>
                 </div>
@@ -53,7 +51,7 @@
                             <li><i class="fa fa-phone"></i> Bảo hành: <a href="tel:0123456789">0123.456.789</a></li>
                             <li><i class="fa fa-clock"></i> Thời gian làm việc: 8h00 - 22h00</li>
                         </ul>
-                        <form class="mt-3">
+                        <!-- <form class="mt-3">
                             <label for="footer-newsletter" style="font-weight:500;">Đăng ký nhận tin:</label>
                             <div class="input-group">
                                 <input type="email" class="form-control" id="footer-newsletter" placeholder="Nhập email của bạn" required>
@@ -61,7 +59,7 @@
                                     <button class="btn btn-primary" type="submit">Gửi</button>
                                 </div>
                             </div>
-                        </form>
+                        </form> -->
                     </div>
                 </div>
             </div>

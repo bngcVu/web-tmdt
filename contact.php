@@ -206,10 +206,7 @@
     </section>
     <!-- ================ contact section end ================= -->
 
-    <!-- <?php 
-        include 'footer.php';
-    ?> -->
-    <!--::footer_part end::-->
+    <?php include 'footer.php';?>
 
     <!-- jquery plugins here-->
     <!-- jquery -->
@@ -243,9 +240,4 @@
 
 
 </html>
-
-</html>
-<?php
-    include './connect.php';
-?>
 
