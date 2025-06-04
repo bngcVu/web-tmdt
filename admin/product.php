@@ -57,7 +57,6 @@
                                                 <th class="addfont" >Ảnh Sản Phẩm</th>
                                                 <th class="addfont" >Trạng Thái</th>
                                                 <th></th>
-                                                <th><a type="button" class="btn btn-success btn-fw" style="width: 204px" href="addproduct.php">Thêm Sản Phẩm</a></th>
                                             </tr>
                                         </thead>
                                         <tbody>
